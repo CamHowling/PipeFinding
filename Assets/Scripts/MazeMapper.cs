@@ -74,7 +74,9 @@ public class MazeMapper : MonoBehaviour
 
     //Private fields
     private bool activeMapping = false;
+    private bool renderPipes = false;
     private Maze activeMaze;
+    private Maze mazeToRender;
     private List<MazeStep> axisMovementSteps;
     private Vector3 collisionBoxScale;
     private Vector3Int maximumIndexVector;
@@ -167,6 +169,11 @@ public class MazeMapper : MonoBehaviour
                     break;
             }
         }
+
+        if (renderPipes)
+        {
+            
+        }
     }
 
     //May need to remove annotation
@@ -182,6 +189,18 @@ public class MazeMapper : MonoBehaviour
         }
 
         generatePipesButton.interactable = true;
+    }
+
+    public void GeneratePipes()
+    {
+        renderPipes = false;
+        generatePipesButton.interactable = false;
+        mazeToRender = mazes.FirstOrDefault(x => x.isSearchComplete);
+        if (mazeToRender != null)
+        {
+            renderPipes = true;
+            return;
+        }
     }
 
     [HideInInspector]
