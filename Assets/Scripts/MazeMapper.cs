@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using Debug = UnityEngine.Debug;
 
 public class MazeMapper : MonoBehaviour
@@ -23,7 +24,6 @@ public class MazeMapper : MonoBehaviour
         public List<MazeCell> searchCells;
         public bool isSearchComplete;
 
-        //TODO cover GetHashCode()
         public override bool Equals(object obj)
         {
             var otherMaze = obj as Maze;
@@ -43,7 +43,6 @@ public class MazeMapper : MonoBehaviour
         public int stepsFromTarget;
         public bool hasCollision;
 
-        //TODO cover GetHashCode()
         public override bool Equals(object obj)
         {
             var otherMaze = obj as MazeCell;
@@ -67,6 +66,10 @@ public class MazeMapper : MonoBehaviour
     public bool debuggerEnabled;
     public float stepValue;
 
+    public Material debuggerTransparentMaterial;
+    private Button mapButton;
+    private Button generatePipesButton;
+
     public List<Maze> mazes = new List<Maze>();
 
     //Private fields
@@ -79,8 +82,11 @@ public class MazeMapper : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //Application.targetFrameRate = 10; //Debuggin only
+        Application.targetFrameRate = 20; //Debuggin only
         debuggerPrefab.transform.localScale = new Vector3(stepValue, stepValue, stepValue);
+ 
+        mapButton = GameObject.Find("Mapping Button").GetComponent<Button>();
+        generatePipesButton = GameObject.Find("Pathfinding Button").GetComponent<Button>();
 
         var mazeBox = maze.GetComponent<Collider>().bounds.size;
         maximumIndexVector = GetIndexVector(mazeBox);
@@ -110,7 +116,7 @@ public class MazeMapper : MonoBehaviour
         var inputToSprinkler1 = new Maze
         {
             startingPosition = input.gameObject.transform.position,
-            targetPosition = sprinkler2.gameObject.transform.position,
+            targetPosition = sprinkler1.gameObject.transform.position,
             mazeGrid = new MazeCell[upperXBound, upperYBound, upperZBound],
             searchCells = new List<MazeCell>()
         };
@@ -118,9 +124,8 @@ public class MazeMapper : MonoBehaviour
         var inputIndex = GetIndexVector(inputToSprinkler1.targetPosition);
         var originCell2 = new MazeCell
         {
-            position = inputToSprinkler1.startingPosition, //review
+            position = inputToSprinkler1.targetPosition,
             stepsFromTarget = 0,
-            //index = searchDirectionVector.magnitude >= 0 ? inputIndex : maximumIndexVector
             index = inputIndex
         };
 
@@ -130,14 +135,6 @@ public class MazeMapper : MonoBehaviour
         mazes.Add(inputToSprinkler1);
     }
 
-    private Vector3Int GetIndexVector(Vector3 vector)
-    {
-        var xPosition = (int)Math.Ceiling(vector.x / stepValue) - 1;
-        var yPosition = (int)Math.Ceiling(vector.y / stepValue) - 1;
-        var zPosition = (int)Math.Ceiling(vector.z / stepValue) - 1;
-        var indexVector = new Vector3Int(xPosition, yPosition, zPosition);
-        return indexVector;
-    }
 
     // Update is called once per frame
     void Update()
@@ -145,21 +142,30 @@ public class MazeMapper : MonoBehaviour
         if (activeMapping)
         {
             var cellsToSearch = new List<MazeCell>();
+            SetCubesTransparent();
 
             foreach (var cell in activeMaze.searchCells)
             {
                 var newCells = SearchNearbyCells(cell);
                 if (activeMaze.isSearchComplete)
                 {
-                    LogGridToConsole();
-                    SetActiveMaze();
                     break;
                 }
 
                 cellsToSearch.AddRange(newCells);
             }
 
-            activeMaze.searchCells = cellsToSearch.Distinct().ToList();
+            switch(activeMaze.isSearchComplete)
+            {
+                case false:
+                    activeMaze.searchCells = cellsToSearch.Distinct().ToList();
+                    break;
+                case true:
+                    cellsToSearch.Clear();
+                    DeleteCubes();
+                    SetActiveMaze();
+                    break;
+            }
         }
     }
 
@@ -172,7 +178,10 @@ public class MazeMapper : MonoBehaviour
         if (activeMaze != null) 
         {
             activeMapping = true;
+            return;
         }
+
+        generatePipesButton.interactable = true;
     }
 
     [HideInInspector]
@@ -219,6 +228,41 @@ public class MazeMapper : MonoBehaviour
         });
     }
 
+    public void DisableMappingButton()
+    {
+        if (mapButton.interactable)
+        {
+            mapButton.interactable = false;
+        }
+    }
+
+    private Vector3Int GetIndexVector(Vector3 vector)
+    {
+        var xPosition = (int)Math.Ceiling(vector.x / stepValue) - 1;
+        var yPosition = (int)Math.Ceiling(vector.y / stepValue) - 1;
+        var zPosition = (int)Math.Ceiling(vector.z / stepValue) - 1;
+        var indexVector = new Vector3Int(xPosition, yPosition, zPosition);
+        return indexVector;
+    }
+
+    private void SetCubesTransparent()
+    {
+        var debuggerCubes = GameObject.FindGameObjectsWithTag("SearchVolume");
+        foreach (var cube in debuggerCubes)
+        {
+            cube.GetComponent<Renderer>().material = debuggerTransparentMaterial;
+        }
+    }
+
+    private void DeleteCubes()
+    {
+        var debuggerCubes = GameObject.FindGameObjectsWithTag("SearchVolume");
+        foreach (var cube in debuggerCubes)
+        {
+            Destroy(cube);
+        }
+    }
+
     private List<MazeCell> SearchNearbyCells(MazeCell cell)
     {
         var newCells = new List<MazeCell>();
@@ -259,13 +303,12 @@ public class MazeMapper : MonoBehaviour
             {
                 Debug.Log("Searched: " + searchLocation.ToString() + ", Found: " + targetReached.ToString());
                 activeMaze.mazeGrid[searchIndex.x, searchIndex.y, searchIndex.z] = searchedCell;
-                LogGridToConsole();
-                //newCells.Add(searchedCell);
-                //Starting point reached
+                activeMaze.isSearchComplete = true;
+                var mazeIndex = mazes.FindIndex(x => x.Equals(activeMaze));
+                mazes[mazeIndex] = activeMaze;
                 break;
             }
 
-            var originColliders = Physics.OverlapBox(cell.position, collisionBoxScale);
             var colliders = Physics.OverlapBox(searchLocation, collisionBoxScale);
             searchedCell.hasCollision = colliders.Length > 0 ? true : false;
 
@@ -273,7 +316,6 @@ public class MazeMapper : MonoBehaviour
 
             if (!searchedCell.hasCollision)
             {
-               //Debug.Log("Steps from target: " + searchedCell.stepsFromTarget.ToString());
                newCells.Add(searchedCell);
             }
         }
@@ -285,7 +327,13 @@ public class MazeMapper : MonoBehaviour
     {
         var targetVector = cell.position - activeMaze.startingPosition;
         var searchVector = cell.position - searchLocation;
-        var targetFound = targetVector.magnitude <= searchVector.magnitude ? true : false;
+        var targetDistance = targetVector - searchVector;
+        var targetFound = targetDistance.magnitude < stepValue/2;
+
+        if (targetFound)
+        {
+            Debug.Log("targetFound");
+        }
 
         return targetFound;
     }
@@ -303,13 +351,4 @@ public class MazeMapper : MonoBehaviour
 
         return true;
     }
-
-    private void LogGridToConsole()
-    {
-        foreach (var gridCell in activeMaze.mazeGrid)
-        {
-            Debug.Log("Cell Searched: " + gridCell.index.ToString() + " at location : " + gridCell.position.ToString() 
-                + ", Steps from target: " + gridCell.stepsFromTarget.ToString() + ", with collision: " + gridCell.hasCollision.ToString());
-        }
-    }    
 }

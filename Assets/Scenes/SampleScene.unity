@@ -823,8 +823,9 @@ MonoBehaviour:
   sprinkler1: {fileID: 278384246}
   sprinkler2: {fileID: 581333410}
   debuggerPrefab: {fileID: 5906505395134087578, guid: 7a6d9686bf1c6684385f1a8d4f77f0f8, type: 3}
-  debugger: {fileID: 1286767751}
-  stepValue: 0.01
+  debuggerEnabled: 1
+  stepValue: 0.05
+  debuggerTransparentMaterial: {fileID: 2100000, guid: 3443234ea47c4b24e82f8e75f3bee52f, type: 2}
 --- !u!4 &887677523
 Transform:
   m_ObjectHideFlags: 0
@@ -1067,11 +1068,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1241501085}
   m_CullTransparentMesh: 1
---- !u!1 &1286767751 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5906505395134087578, guid: 7a6d9686bf1c6684385f1a8d4f77f0f8, type: 3}
-  m_PrefabInstance: {fileID: 765516625}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1750225200
 GameObject:
   m_ObjectHideFlags: 0
@@ -1513,6 +1509,18 @@ MonoBehaviour:
       - m_Target: {fileID: 887677522}
         m_TargetAssemblyTypeName: MazeMapper, Assembly-CSharp
         m_MethodName: SetActiveMaze
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 1
+      - m_Target: {fileID: 887677522}
+        m_TargetAssemblyTypeName: MazeMapper, Assembly-CSharp
+        m_MethodName: DisableMappingButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
