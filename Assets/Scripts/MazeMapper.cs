@@ -10,53 +10,6 @@ using Debug = UnityEngine.Debug;
 
 public class MazeMapper : MonoBehaviour
 {
-    //TODO move into dedicated class..
-
-    /// <summary>
-    /// Represents the Maze problem in the context of connecting two points
-    /// </summary>
-    [HideInInspector]
-    public class Maze
-    {
-        public MazeCell[,,] mazeGrid;
-        public Vector3 startingPosition;
-        public Vector3 targetPosition;
-        public List<MazeCell> searchCells;
-        public bool isSearchComplete;
-
-        public override bool Equals(object obj)
-        {
-            var otherMaze = obj as Maze;
-            var isEqual = this.startingPosition.Equals(otherMaze.startingPosition) && this.targetPosition.Equals(otherMaze.targetPosition);
-            return isEqual;
-        }
-    }
-
-    /// <summary>
-    /// Represents a 3D cell of the maze object
-    /// </summary>
-    [HideInInspector]
-    public class MazeCell
-    {
-        public Vector3 position;
-        public Vector3Int index;
-        public int stepsFromTarget;
-        public bool hasCollision;
-
-        public override bool Equals(object obj)
-        {
-            var otherMaze = obj as MazeCell;
-            var isEqual = this.position.Equals(otherMaze.position);
-            return isEqual;
-        }
-    }
-
-    public class MazeStep
-    {
-        public Vector3 deltaPosition;
-        public Vector3Int deltaIndex;
-    }
-
     //UI and Scene input
     public GameObject maze;
     public GameObject input;
@@ -106,6 +59,7 @@ public class MazeMapper : MonoBehaviour
             searchCells = new List<MazeCell>()
         };
 
+        sprinkler1ToSprinkler2.pipeStartIndex = GetIndexVector(sprinkler1ToSprinkler2.startingPosition);
         var sprinkler2Index = GetIndexVector(sprinkler1ToSprinkler2.targetPosition);
         var originCell = new MazeCell
         {
@@ -123,12 +77,13 @@ public class MazeMapper : MonoBehaviour
             searchCells = new List<MazeCell>()
         };
 
-        var inputIndex = GetIndexVector(inputToSprinkler1.targetPosition);
+        inputToSprinkler1.pipeStartIndex = GetIndexVector(inputToSprinkler1.startingPosition);
+        var sprinkler1Index = GetIndexVector(inputToSprinkler1.targetPosition);
         var originCell2 = new MazeCell
         {
             position = inputToSprinkler1.targetPosition,
             stepsFromTarget = 0,
-            index = inputIndex
+            index = sprinkler1Index
         };
 
         inputToSprinkler1.searchCells.Add(originCell2);
@@ -169,11 +124,6 @@ public class MazeMapper : MonoBehaviour
                     break;
             }
         }
-
-        if (renderPipes)
-        {
-            
-        }
     }
 
     //May need to remove annotation
@@ -189,18 +139,6 @@ public class MazeMapper : MonoBehaviour
         }
 
         generatePipesButton.interactable = true;
-    }
-
-    public void GeneratePipes()
-    {
-        renderPipes = false;
-        generatePipesButton.interactable = false;
-        mazeToRender = mazes.FirstOrDefault(x => x.isSearchComplete);
-        if (mazeToRender != null)
-        {
-            renderPipes = true;
-            return;
-        }
     }
 
     [HideInInspector]
