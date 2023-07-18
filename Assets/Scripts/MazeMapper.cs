@@ -18,14 +18,16 @@ public class MazeMapper : MonoBehaviour
     public GameObject debuggerPrefab;
     public bool debuggerEnabled;
     public float stepValue;
-
     public Material debuggerTransparentMaterial;
+
+    //Private
     private Button mapButton;
     private Button generatePipesButton;
 
+    //Fields
     public List<Maze> mazes = new List<Maze>();
 
-    //Private fields
+    //Private
     private bool activeMapping = false;
     private bool renderPipes = false;
     private Maze activeMaze;
@@ -37,7 +39,6 @@ public class MazeMapper : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //Application.targetFrameRate = 20; //Debuggin only
         debuggerPrefab.transform.localScale = new Vector3(stepValue, stepValue, stepValue);
 
         mapButton = GameObject.Find("Mapping Button").GetComponent<Button>();
@@ -89,7 +90,7 @@ public class MazeMapper : MonoBehaviour
         inputToSprinkler1.searchCells.Add(originCell2);
 
         mazes.Add(sprinkler1ToSprinkler2);
-        //mazes.Add(inputToSprinkler1);
+        mazes.Add(inputToSprinkler1);
     }
 
 
@@ -126,8 +127,6 @@ public class MazeMapper : MonoBehaviour
         }
     }
 
-    //May need to remove annotation
-    [HideInInspector]
     public void SetActiveMaze()
     {
         activeMapping = false;
@@ -141,7 +140,6 @@ public class MazeMapper : MonoBehaviour
         generatePipesButton.interactable = true;
     }
 
-    [HideInInspector]
     public void UpdateAxisMovementVectors()
     {
         var collisionHalfStep = stepValue;

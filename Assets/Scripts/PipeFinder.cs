@@ -13,15 +13,15 @@ public class PipeFinder : MonoBehaviour
     public GameObject basePipe;
     public GameObject anglePipe;
     public GameObject tPipe;
-
     public GameObject BasePipeText;
     public GameObject AnglePipeText;
     public GameObject TPipeText;
     public GameObject TotalPipeLengthText;
 
+    //Private
     private Button generatePipesButton;
 
-    //Private fields
+    //Fields
     private MazeCell currentCell;
     private float stepValue;
     private Vector3Int currentMazeIndex;
