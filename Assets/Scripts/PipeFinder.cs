@@ -38,7 +38,7 @@ public class PipeFinder : MonoBehaviour
     {
         if (calculatePipeline)
         {
-            if (currentMazeIndex!= null) 
+            if (currentMazeIndex != null) 
             {
                 var currentCell = mazeToRender.mazeGrid[currentMazeIndex.x, currentMazeIndex.y, currentMazeIndex.z];
                 var pipePosition = new Vector3(currentCell.position.x, currentCell.position.y + stepValue/2, currentCell.position.z);
@@ -81,9 +81,8 @@ public class PipeFinder : MonoBehaviour
         foreach (var stepVector in stepVectors) 
         {
             var stepCell = mazeToRender.mazeGrid[index.x + stepVector.x, index.y + stepVector.y, index.z + stepVector.z];
-            //cells.Add(stepCell);
-            //if (cell == null || stepCell != null && stepCell.stepsFromTarget < cell.stepsFromTarget)
-            if (stepCell != null)
+            var isTarget = stepCell != null && stepCell.position == mazeToRender.targetPosition;
+            if (stepCell != null && (!stepCell.hasCollision || isTarget))
             {
                 cells.Add(stepCell);
             }

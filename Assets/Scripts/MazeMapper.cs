@@ -193,12 +193,16 @@ public class MazeMapper : MonoBehaviour
         }
     }
 
+    //When converting a float to double the ratio gives an incorrect result, so we round it
     private Vector3Int GetIndexVector(Vector3 vector)
     {
-        var xPosition = (int)Math.Ceiling(vector.x / stepValue) - 1;
-        var yPosition = (int)Math.Ceiling(vector.y / stepValue) - 1;
-        var zPosition = (int)Math.Ceiling(vector.z / stepValue) - 1;
-        var indexVector = new Vector3Int(xPosition, yPosition, zPosition);
+        var xIndexBase = Math.Round(vector.x / stepValue, 3);
+        var xIndex = (int)Math.Ceiling(xIndexBase) - 1;
+        var yIndexBase = Math.Round(vector.y / stepValue, 3);
+        var yIndex = (int)Math.Ceiling(yIndexBase) - 1;
+        var zIndexBase = Math.Round(vector.z / stepValue, 3);
+        var zIndex = (int)Math.Ceiling(zIndexBase) - 1;
+        var indexVector = new Vector3Int(xIndex, yIndex, zIndex);
         return indexVector;
     }
 
