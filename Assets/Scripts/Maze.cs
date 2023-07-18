@@ -55,6 +55,7 @@ public class MazeStep
 /// </summary>
 public class MazePipe
 {
+    public GameObject gameObject;
     public Vector3 position;
     public Vector3? prevPipe;
     public Vector3? nextPipe;

@@ -86,10 +86,9 @@ public class PipeFinder : MonoBehaviour
                 UpdatePipeTypeAndRotation(pipe, pipeIndex);
             }
 
-            if (!pipe.IsRendered)
+            if (pipe.gameObject == null)
             {
-                var gameObj = Instantiate(basePipe, pipe.position, pipe.rotation);
-                pipe.IsRendered = true;
+                pipe.gameObject = Instantiate(basePipe, pipe.position, pipe.rotation);
             }
         }
     }
@@ -132,8 +131,15 @@ public class PipeFinder : MonoBehaviour
         //Orthogonal, IE angle pipe
         if (dotProduct == 0)
         {
-            pipe.rotation = Quaternion.FromToRotation(Vector3.up, nextUnitVector);
+            
+            pipe.rotation = Quaternion.LookRotation(nextUnitVector, prevUnitVector);
             pipe.type = PipeType.RightAngle;
+            if (pipe.gameObject != null)
+            {
+                Destroy(pipe.gameObject);
+                pipe.gameObject = Instantiate(anglePipe, pipe.position, pipe.rotation);
+            }
+            
             return;
         }
     }
