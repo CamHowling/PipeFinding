@@ -41,8 +41,7 @@ public class PipeFinder : MonoBehaviour
             if (currentMazeIndex != null) 
             {
                 var currentCell = mazeToRender.mazeGrid[currentMazeIndex.x, currentMazeIndex.y, currentMazeIndex.z];
-                var pipePosition = new Vector3(currentCell.position.x, currentCell.position.y + stepValue/2, currentCell.position.z);
-                Instantiate(basePipe, pipePosition, Quaternion.identity);
+                Instantiate(basePipe, currentCell.position, Quaternion.identity);
             }
 
             //check here to see if a pipe in this position has already been rendered
@@ -82,7 +81,14 @@ public class PipeFinder : MonoBehaviour
         {
             var stepCell = mazeToRender.mazeGrid[index.x + stepVector.x, index.y + stepVector.y, index.z + stepVector.z];
             var isTarget = stepCell != null && stepCell.position == mazeToRender.targetPosition;
-            if (stepCell != null && (!stepCell.hasCollision || isTarget))
+            if (isTarget)
+            {
+                cells.Clear();
+                Instantiate(basePipe, stepCell.position, Quaternion.identity);
+                return cells;
+            }
+
+            if (stepCell != null && !stepCell.hasCollision)
             {
                 cells.Add(stepCell);
             }
