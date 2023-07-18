@@ -191,6 +191,12 @@ public class MazeMapper : MonoBehaviour
         }
     }
 
+    public void HideShowMaze()
+    {
+        var visibility = GameObject.FindGameObjectWithTag("MazeVolume").GetComponent<MeshRenderer>().enabled;
+        GameObject.FindGameObjectWithTag("MazeVolume").GetComponent<MeshRenderer>().enabled = !visibility;
+    }
+
     //When converting a float to double the ratio gives an incorrect result, so we round it
     private Vector3Int GetIndexVector(Vector3 vector)
     {

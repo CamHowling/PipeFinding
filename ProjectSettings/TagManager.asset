@@ -8,6 +8,7 @@ TagManager:
   - Base Pipe
   - Angle Pipe
   - T Pipe
+  - MazeVolume
   layers:
   - Default
   - TransparentFX

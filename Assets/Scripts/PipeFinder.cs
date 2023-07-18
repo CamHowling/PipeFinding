@@ -19,6 +19,8 @@ public class PipeFinder : MonoBehaviour
     public GameObject TotalPipeLengthText;
     public GameObject RightCamera;
     public GameObject PipeCamera;
+    public GameObject AboveCamera;
+    public GameObject PipeVerticalCamera;
 
     //Private
     private Button generatePipesButton;
@@ -75,6 +77,8 @@ public class PipeFinder : MonoBehaviour
     {
         RightCamera.GetComponent<Camera>().enabled = false;
         PipeCamera.GetComponent<Camera>().enabled = true;
+        AboveCamera.GetComponent<Camera>().enabled = false;
+        PipeVerticalCamera.GetComponent<Camera>().enabled = true;
 
         calculatePipeline = false;
         generatePipesButton.interactable = false;
