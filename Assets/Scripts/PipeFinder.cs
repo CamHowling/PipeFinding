@@ -30,7 +30,9 @@ public class PipeFinder : MonoBehaviour
         pipeline = new List<MazePipe>();
         generatePipesButton = GameObject.Find("Pathfinding Button").GetComponent<Button>();
         stepValue = mazeMapper.stepValue;
-        basePipe.transform.localScale = new Vector3(stepValue, stepValue/2, stepValue);
+        basePipe.transform.localScale = new Vector3(stepValue, stepValue, stepValue);
+        anglePipe.transform.localScale = new Vector3(stepValue, stepValue, stepValue);
+        tPipe.transform.localScale = new Vector3(stepValue, stepValue, stepValue);
         UpdateIndexStepVectors();
     }
 
@@ -48,14 +50,13 @@ public class PipeFinder : MonoBehaviour
             AddPipe(currentCell);
 
             //check here to see if a pipe in this position has already been rendered
-            var nextCell = GetNextCell(currentMazeIndex);
+            var nextCell = GetNextCell((Vector3Int)currentMazeIndex);
             if (nextCell == null)
             {
                 calculatePipeline = false;
-                return;
             }
 
-            currentMazeIndex = nextCell.index;
+            currentMazeIndex = nextCell != null ? nextCell.index : Vector3Int.zero;
         }
 
         RenderPipeline();
@@ -137,9 +138,9 @@ public class PipeFinder : MonoBehaviour
             if (pipe.gameObject != null)
             {
                 Destroy(pipe.gameObject);
-                pipe.gameObject = Instantiate(anglePipe, pipe.position, pipe.rotation);
             }
-            
+
+            pipe.gameObject = Instantiate(anglePipe, pipe.position, pipe.rotation);
             return;
         }
     }
