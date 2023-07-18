@@ -78,8 +78,12 @@ public class PipeFinder : MonoBehaviour
 
         calculatePipeline = false;
         generatePipesButton.interactable = false;
-        mazes = mazeMapper.mazes;
-        mazeToRender = mazes.FirstOrDefault(x => x.isSearchComplete);
+        if (mazes.Count == 0)
+        {
+            mazes = mazeMapper.mazes;
+        }
+        
+        mazeToRender = mazes.FirstOrDefault(x => x.isSearchComplete && !x.isRenderComplete);
         if (mazeToRender != null)
         {
             currentMazeIndex = mazeToRender.pipeStartIndex;
@@ -131,6 +135,17 @@ public class PipeFinder : MonoBehaviour
             {
                 pipe.gameObject = Instantiate(basePipe, pipe.position, pipe.rotation);
             }
+        }
+
+        if (calculatePipeline == false && pipeline.Count() > 0 && pipeline[pipeline.Count() - 1].gameObject != null)
+        {
+            var mazeToUpdate = mazes.FirstOrDefault(x => x.isSearchComplete && !x.isRenderComplete);
+            if (mazeToUpdate != null) 
+            {
+                mazeToUpdate.isRenderComplete = true;
+            }
+            
+            GeneratePipes();
         }
     }
 

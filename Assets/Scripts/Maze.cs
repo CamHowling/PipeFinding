@@ -14,6 +14,7 @@ public class Maze
     public Vector3Int pipeStartIndex;
     public List<MazeCell> searchCells;
     public bool isSearchComplete;
+    public bool isRenderComplete;
 
     public override bool Equals(object obj)
     {
