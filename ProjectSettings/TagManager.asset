@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 2
   tags:
   - SearchVolume
+  - Base Pipe
+  - Angle Pipe
+  - T Pipe
   layers:
   - Default
   - TransparentFX

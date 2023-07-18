@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,6 +13,11 @@ public class PipeFinder : MonoBehaviour
     public GameObject basePipe;
     public GameObject anglePipe;
     public GameObject tPipe;
+
+    public GameObject BasePipeText;
+    public GameObject AnglePipeText;
+    public GameObject TPipeText;
+    public GameObject TotalPipeLengthText;
 
     private Button generatePipesButton;
 
@@ -60,6 +66,7 @@ public class PipeFinder : MonoBehaviour
         }
 
         RenderPipeline();
+        UpdatePipeCounts();
     }
 
     public void GeneratePipes()
@@ -74,6 +81,34 @@ public class PipeFinder : MonoBehaviour
             calculatePipeline = true;
             return;
         }
+    }
+
+    private void UpdatePipeCounts()
+    {
+        var baseCount = 0;
+        var angleCount = 0;
+        var tCount = 0;
+
+        foreach (var pipe in pipeline)
+        {
+            switch (pipe.type)
+            {
+                case PipeType.Base: 
+                    baseCount++; 
+                    break;
+                case PipeType.RightAngle: 
+                    angleCount++; 
+                    break;
+                case PipeType.TSection: 
+                    tCount++; 
+                    break;
+            }
+        }
+
+        BasePipeText.GetComponent<TextMeshProUGUI>().text = baseCount.ToString();
+        AnglePipeText.GetComponent<TextMeshProUGUI>().text = angleCount.ToString();
+        TPipeText.GetComponent <TextMeshProUGUI>().text = tCount.ToString();
+        TotalPipeLengthText.GetComponent<TextMeshProUGUI>().text = (pipeline.Count * stepValue).ToString("0.00") + " M";
     }
 
     private void RenderPipeline()
@@ -196,7 +231,6 @@ public class PipeFinder : MonoBehaviour
         stepVectors.Add(new Vector3Int(0, 0, 1));
         stepVectors.Add(new Vector3Int(0, 0, -1));
     }
-
 
     private Dictionary<PipeType, GameObject> GetPipePrefabDictionary()
     {

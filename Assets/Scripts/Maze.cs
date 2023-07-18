@@ -61,7 +61,6 @@ public class MazePipe
     public Vector3? nextPipe;
     public Quaternion rotation; 
     public PipeType type;
-    public bool IsRendered; //might not need
 }
 
 public enum PipeType
