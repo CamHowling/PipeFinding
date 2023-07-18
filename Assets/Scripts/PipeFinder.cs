@@ -16,17 +16,18 @@ public class PipeFinder : MonoBehaviour
     private Button generatePipesButton;
 
     //Private fields
+    private MazeCell currentCell;
     private float stepValue;
     private Vector3Int currentMazeIndex;
-    private Vector3[] pipeline;
+    private List<MazePipe> pipeline;
     private bool calculatePipeline = false;
-    private bool renderPipes = false;
     private Maze mazeToRender;
     private List<Vector3Int> stepVectors;
 
     // Start is called before the first frame update
     void Start()
     {
+        pipeline = new List<MazePipe>();
         generatePipesButton = GameObject.Find("Pathfinding Button").GetComponent<Button>();
         stepValue = mazeMapper.stepValue;
         basePipe.transform.localScale = new Vector3(stepValue, stepValue/2, stepValue);
@@ -38,18 +39,16 @@ public class PipeFinder : MonoBehaviour
     {
         if (calculatePipeline)
         {
-            if (currentMazeIndex != null) 
+            if (currentMazeIndex == null) 
             {
-                var currentCell = mazeToRender.mazeGrid[currentMazeIndex.x, currentMazeIndex.y, currentMazeIndex.z];
-                Instantiate(basePipe, currentCell.position, Quaternion.identity);
+                return;
             }
 
+            currentCell = mazeToRender.mazeGrid[currentMazeIndex.x, currentMazeIndex.y, currentMazeIndex.z];
+            AddPipe(currentCell);
+
             //check here to see if a pipe in this position has already been rendered
-            var adjacentCells = GetNextCells(currentMazeIndex);
-            var nextCell = adjacentCells.FirstOrDefault();
-            //var nextNextCell = GetNextCell(nextCell.index);
-            //var firstStepDirection = (nextCell.position - currentCell.position).normalized;
-            //var secondStep = (nextNextCell.position - nextCell.position).normalized;
+            var nextCell = GetNextCell(currentMazeIndex);
             if (nextCell == null)
             {
                 calculatePipeline = false;
@@ -58,6 +57,8 @@ public class PipeFinder : MonoBehaviour
 
             currentMazeIndex = nextCell.index;
         }
+
+        RenderPipeline();
     }
 
     public void GeneratePipes()
@@ -74,7 +75,19 @@ public class PipeFinder : MonoBehaviour
         }
     }
 
-    private List<MazeCell> GetNextCells(Vector3Int index)
+    private void RenderPipeline()
+    {
+        foreach (var pipe in pipeline)
+        {
+            if (!pipe.IsRendered)
+            {
+                Instantiate(basePipe, pipe.position, Quaternion.identity);
+                pipe.IsRendered = true;
+            }
+        }
+    }
+
+    private MazeCell GetNextCell(Vector3Int index)
     {
         List<MazeCell> cells = new List<MazeCell>();
         foreach (var stepVector in stepVectors) 
@@ -83,21 +96,36 @@ public class PipeFinder : MonoBehaviour
             var isTarget = stepCell != null && stepCell.position == mazeToRender.targetPosition;
             if (isTarget)
             {
-                cells.Clear();
-                Instantiate(basePipe, stepCell.position, Quaternion.identity);
-                return cells;
+                AddPipe(stepCell);
+                return null;
             }
 
-            if (stepCell != null && !stepCell.hasCollision)
+            if (stepCell == null || stepCell.hasCollision)
             {
-                cells.Add(stepCell);
+                continue;
             }
+
+            cells.Add(stepCell);
+
         }
 
         var orderedCells = cells.OrderBy(x => x.stepsFromTarget).ToList();
         var fewestSteps = orderedCells[0].stepsFromTarget;
         var nextCells = cells.Where(x => x.stepsFromTarget == fewestSteps).ToList();
-        return nextCells;
+        return nextCells.FirstOrDefault();
+    }
+
+    private void AddPipe(MazeCell cell)
+    {
+        var previousCell = currentCell;
+        currentCell = cell;
+
+        var pipe = new MazePipe()
+        {
+            position = currentCell.position,
+        };
+
+        pipeline.Add(pipe);
     }
 
     private void UpdateIndexStepVectors()
@@ -109,5 +137,18 @@ public class PipeFinder : MonoBehaviour
         stepVectors.Add(new Vector3Int(0, -1, 0));
         stepVectors.Add(new Vector3Int(0, 0, 1));
         stepVectors.Add(new Vector3Int(0, 0, -1));
+    }
+
+
+    private Dictionary<PipeType, GameObject> GetPipePrefabDictionary()
+    {
+        var dictionary = new Dictionary<PipeType, GameObject>
+        {
+            { PipeType.Base, basePipe },
+            { PipeType.TSection, tPipe },
+            { PipeType.RightAngle, anglePipe }
+        };
+
+        return dictionary;
     }
 }

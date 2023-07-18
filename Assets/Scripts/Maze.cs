@@ -56,8 +56,11 @@ public class MazeStep
 public class MazePipe
 {
     public Vector3 position;
-    public Vector3Int rotation; //rotation
+    public Vector3 prevPipe;
+    public Vector3 nextPipe;
+    public Vector3 rotation; 
     public PipeType type;
+    public bool IsRendered; //might not need
 }
 
 public enum PipeType

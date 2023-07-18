@@ -39,16 +39,16 @@ public class MazeMapper : MonoBehaviour
     {
         Application.targetFrameRate = 20; //Debuggin only
         debuggerPrefab.transform.localScale = new Vector3(stepValue, stepValue, stepValue);
- 
+
         mapButton = GameObject.Find("Mapping Button").GetComponent<Button>();
         generatePipesButton = GameObject.Find("Pathfinding Button").GetComponent<Button>();
 
         var mazeBox = maze.GetComponent<Collider>().bounds.size;
         maximumIndexVector = GetIndexVector(mazeBox);
-        
+
         var upperXBound = (int)Math.Ceiling(mazeBox.x / stepValue) - 1;
         var upperYBound = (int)Math.Ceiling(mazeBox.y / stepValue) - 1;
-        var upperZBound = (int)Math.Ceiling(mazeBox.z / stepValue) - 1;    
+        var upperZBound = (int)Math.Ceiling(mazeBox.z / stepValue) - 1;
 
         UpdateAxisMovementVectors();
         var sprinkler1ToSprinkler2 = new Maze
@@ -112,7 +112,7 @@ public class MazeMapper : MonoBehaviour
                 cellsToSearch.AddRange(newCells);
             }
 
-            switch(activeMaze.isSearchComplete)
+            switch (activeMaze.isSearchComplete)
             {
                 case false:
                     activeMaze.searchCells = cellsToSearch.Distinct().ToList();
@@ -132,7 +132,7 @@ public class MazeMapper : MonoBehaviour
     {
         activeMapping = false;
         activeMaze = mazes.FirstOrDefault(x => !x.isSearchComplete);
-        if (activeMaze != null) 
+        if (activeMaze != null)
         {
             activeMapping = true;
             return;
@@ -230,9 +230,9 @@ public class MazeMapper : MonoBehaviour
 
         foreach (var searchStep in axisMovementSteps)
         {
-            
+
             var searchIndex = cell.index + searchStep.deltaIndex;
-            
+
             var validSearch = IsValidSearchIndex(searchIndex);
             if (!validSearch)
             {
@@ -251,7 +251,7 @@ public class MazeMapper : MonoBehaviour
             {
                 Instantiate(debuggerPrefab, searchLocation, Quaternion.identity);
             }
-            
+
             var searchedCell = new MazeCell
             {
                 position = searchLocation,
@@ -259,7 +259,7 @@ public class MazeMapper : MonoBehaviour
                 stepsFromTarget = cell.stepsFromTarget + 1
             };
 
-            var targetReached = IsTargetWithinStep(cell, searchLocation);        
+            var targetReached = IsTargetWithinStep(cell, searchLocation);
             if (targetReached)
             {
                 Debug.Log("Searched: " + searchLocation.ToString() + ", Found: " + targetReached.ToString());
@@ -277,7 +277,7 @@ public class MazeMapper : MonoBehaviour
 
             if (!searchedCell.hasCollision)
             {
-               newCells.Add(searchedCell);
+                newCells.Add(searchedCell);
             }
         }
 
@@ -289,7 +289,7 @@ public class MazeMapper : MonoBehaviour
         var targetVector = cell.position - activeMaze.startingPosition;
         var searchVector = cell.position - searchLocation;
         var targetDistance = targetVector - searchVector;
-        var targetFound = targetDistance.magnitude < stepValue/2;
+        var targetFound = targetDistance.magnitude < stepValue / 2;
 
         if (targetFound)
         {
@@ -304,7 +304,7 @@ public class MazeMapper : MonoBehaviour
 
         if (
             searchIndex.x < 0 || searchIndex.x > maximumIndexVector.x - 1 ||
-            searchIndex.y < 0 || searchIndex.y > maximumIndexVector.y - 1 || 
+            searchIndex.y < 0 || searchIndex.y > maximumIndexVector.y - 1 ||
             searchIndex.z < 0 || searchIndex.z > maximumIndexVector.z - 1)
         {
             return false;
