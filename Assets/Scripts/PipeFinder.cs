@@ -79,11 +79,62 @@ public class PipeFinder : MonoBehaviour
     {
         foreach (var pipe in pipeline)
         {
+            var pipeIndex = pipeline.IndexOf(pipe);
+            if ((pipe.prevPipe == null && pipeIndex != 0) ||
+                (pipe.nextPipe == null && pipeIndex != pipeline.Count()))
+            {
+                UpdatePipeTypeAndRotation(pipe, pipeIndex);
+            }
+
             if (!pipe.IsRendered)
             {
-                Instantiate(basePipe, pipe.position, Quaternion.identity);
+                var gameObj = Instantiate(basePipe, pipe.position, pipe.rotation);
                 pipe.IsRendered = true;
             }
+        }
+    }
+
+    private void UpdatePipeTypeAndRotation(MazePipe pipe, int pipeIndex)
+    {
+        pipe.prevPipe = pipeIndex != 0 ? pipe.position - pipeline[pipeIndex - 1].position : null;
+        pipe.nextPipe = pipeIndex != pipeline.Count - 1 ? pipeline[pipeIndex + 1].position - pipe.position : null;
+        pipe.rotation = Quaternion.identity;
+        pipe.type = PipeType.Base;
+
+        if (pipe.prevPipe == null && pipe.nextPipe == null)
+        {
+            return;
+        }
+
+        var nextUnitVector = pipe.nextPipe != null ? ((Vector3)pipe.nextPipe).normalized : Vector3.zero;
+        if (pipe.prevPipe == null && pipe.nextPipe != null)
+        {
+            pipe.rotation = Quaternion.FromToRotation(Vector3.up, nextUnitVector);
+            return;
+        }
+
+        var prevUnitVector = pipe.prevPipe != null ? ((Vector3)pipe.prevPipe).normalized : Vector3.zero;
+        if (pipe.prevPipe != null && pipe.nextPipe == null)
+        {
+            pipe.rotation = Quaternion.FromToRotation(Vector3.up, prevUnitVector);
+            return;
+        }
+
+        //Straight pipe
+        var dotProduct = Vector3.Dot(prevUnitVector, nextUnitVector);
+        if (dotProduct == 1)
+        {
+
+            pipe.rotation = Quaternion.FromToRotation(Vector3.up, nextUnitVector);
+            return;
+        }
+
+        //Orthogonal, IE angle pipe
+        if (dotProduct == 0)
+        {
+            pipe.rotation = Quaternion.FromToRotation(Vector3.up, nextUnitVector);
+            pipe.type = PipeType.RightAngle;
+            return;
         }
     }
 

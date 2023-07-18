@@ -56,9 +56,9 @@ public class MazeStep
 public class MazePipe
 {
     public Vector3 position;
-    public Vector3 prevPipe;
-    public Vector3 nextPipe;
-    public Vector3 rotation; 
+    public Vector3? prevPipe;
+    public Vector3? nextPipe;
+    public Quaternion rotation; 
     public PipeType type;
     public bool IsRendered; //might not need
 }

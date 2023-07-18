@@ -37,7 +37,7 @@ public class MazeMapper : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Application.targetFrameRate = 20; //Debuggin only
+        //Application.targetFrameRate = 20; //Debuggin only
         debuggerPrefab.transform.localScale = new Vector3(stepValue, stepValue, stepValue);
 
         mapButton = GameObject.Find("Mapping Button").GetComponent<Button>();
@@ -89,7 +89,7 @@ public class MazeMapper : MonoBehaviour
         inputToSprinkler1.searchCells.Add(originCell2);
 
         mazes.Add(sprinkler1ToSprinkler2);
-        mazes.Add(inputToSprinkler1);
+        //mazes.Add(inputToSprinkler1);
     }
 
 
